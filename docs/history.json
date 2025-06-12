@@ -1,0 +1,15 @@
+[
+  {
+    "timestamp": "2025-06-12T07:04:01.977Z",
+    "statuses": [
+      {
+        "name": "Servidor Fagor",
+        "status": "online"
+      },
+      {
+        "name": "Servidor Github",
+        "status": "online"
+      }
+    ]
+  }
+]

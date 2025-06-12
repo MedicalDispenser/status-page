@@ -1,0 +1,32 @@
+name: Generar página de estado
+
+on:
+  schedule:
+    - cron: '0 * * * *' # cada hora
+  workflow_dispatch: # para ejecutarlo manualmente
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configurar Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Ejecutar script
+        run: node generateStatus.js
+
+      - name: Subir cambios
+        run: |
+          git config user.name "urrzubi"
+          git config user.email "josurru1@gmail.com"
+          git add docs/
+          git commit -m "Actualización automática"
+          git push

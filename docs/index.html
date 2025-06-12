@@ -1,1 +1,70 @@
-<html><head><title>Estado de servidores</title></head><body><h1>Estado de servidores</h1><ul><li><strong>Servidor Fagor</strong>: ✅ En línea</li><li><strong>Servidor Github</strong>: ✅ En línea</li></ul><p>Última actualización: 12/6/2025, 8:45:45</p></body></html>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Estado de Servidores</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; background: #f9f9f9; }
+    table { margin: 2rem auto; width: 60%; border-collapse: collapse; }
+    td, th { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
+    .ok { color: green; font-weight: bold; }
+    .warn { color: orange; font-weight: bold; }
+    .down { color: red; font-weight: bold; }
+    canvas { max-width: 90%; margin: 0 auto; display: block; }
+  </style>
+</head>
+<body>
+  <h1>Estado de Servidores</h1>
+  <table>
+    <thead><tr><th>Servidor</th><th>Estado</th></tr></thead><tbody>
+<tr><td>Servidor Fagor</td><td class="ok">online</td></tr><tr><td>Servidor Github</td><td class="ok">online</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Historial de uptime</h2>
+  <canvas id="uptimeChart"></canvas>
+
+  <script>
+    const history = [{"timestamp":"2025-06-12T07:04:01.977Z","statuses":[{"name":"Servidor Fagor","status":"online"},{"name":"Servidor Github","status":"online"}]}];
+    const servers = ["Servidor Fagor","Servidor Github"];
+
+    const labels = history.map(h => new Date(h.timestamp).toLocaleString());
+    const datasets = servers.map(name => {
+      return {
+        label: name,
+        data: history.map(entry => {
+          const found = entry.statuses.find(s => s.name === name);
+          if (!found) return null;
+          return found.status === 'online' ? 1 : 0;
+        }),
+        fill: false,
+        borderColor: name === 'Servidor Principal' ? 'green' : 'blue',
+        tension: 0.1
+      };
+    });
+
+    new Chart(document.getElementById('uptimeChart'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets
+      },
+      options: {
+        scales: {
+          y: {
+            ticks: {
+              callback: value => value === 1 ? 'Online' : 'Offline'
+            },
+            beginAtZero: true,
+            max: 1
+          }
+        }
+      }
+    });
+  </script>
+
+  <p>Última actualización: 12/6/2025, 9:04:02</p>
+</body>
+</html>
