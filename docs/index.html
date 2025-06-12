@@ -6,65 +6,153 @@
   <title>Estado de Servidores</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { font-family: sans-serif; padding: 2rem; background: #f9f9f9; }
-    table { margin: 2rem auto; width: 60%; border-collapse: collapse; }
-    td, th { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
+    body { font-family: sans-serif; background: #f4f4f4; padding: 2rem; color: #333; }
+    h1, h2 { text-align: center; }
+    section { background: #fff; border-radius: 10px; padding: 1rem; margin-bottom: 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { padding: 0.75rem; border-bottom: 1px solid #ddd; }
     .ok { color: green; font-weight: bold; }
     .warn { color: orange; font-weight: bold; }
     .down { color: red; font-weight: bold; }
-    canvas { max-width: 90%; margin: 0 auto; display: block; }
+    canvas { max-width: 100%; margin-top: 1rem; }
+    footer { text-align: center; color: #777; font-size: 0.9rem; margin-top: 2rem; }
+    :root {
+      --bg: #ffffff;
+      --fg: #222222;
+      --card-bg: #f9f9f9;
+      --ok: #2ecc71;
+      --warn: #f1c40f;
+      --down: #e74c3c;
+    }
+
+    body.dark {
+      --bg: #1e1e1e;
+      --fg: #f0f0f0;
+      --card-bg: #2b2b2b;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: sans-serif;
+      padding: 2rem;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    section {
+      background: var(--card-bg);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .ok { color: var(--ok); font-weight: bold; }
+    .warn { color: var(--warn); font-weight: bold; }
+    .down { color: var(--down); font-weight: bold; }
+
   </style>
 </head>
 <body>
+  <button id="theme-toggle" style="position: fixed; top: 1rem; right: 1rem; z-index: 1000;">🌓</button>
   <h1>Estado de Servidores</h1>
-  <table>
-    <thead><tr><th>Servidor</th><th>Estado</th></tr></thead><tbody>
-<tr><td>Servidor Fagor</td><td class="ok">online</td></tr><tr><td>Servidor Github</td><td class="ok">online</td></tr>
-    </tbody>
-  </table>
+<section><h2>Servidores internos</h2><table><thead><tr><th>Servidor</th><th>Estado</th></tr></thead><tbody><tr><td>Fagor Healthcare</td><td class="ok">✅ online</td></tr><tr><td>Github</td><td class="ok">✅ online</td></tr></tbody></table><canvas id="chart-Servidores-internos" height="100"></canvas></section><section><h2>Servidores externos</h2><table><thead><tr><th>Servidor</th><th>Estado</th></tr></thead><tbody><tr><td>Farmanager v0</td><td class="ok">✅ online</td></tr><tr><td>Farmanager v1</td><td class="ok">✅ online</td></tr><tr><td>Botplus</td><td class="ok">✅ online</td></tr><tr><td>Sifarma</td><td class="warn">⚠️ error</td></tr></tbody></table><canvas id="chart-Servidores-externos" height="100"></canvas></section><script src="https://cdn.jsdelivr.net/npm/chart.js"></script><script>
+    const serverHistory = {"Fagor Healthcare":[{"time":"2025-06-12T07:29:28.533Z","status":1},{"time":"2025-06-12T07:33:52.373Z","status":1},{"time":"2025-06-12T07:50:18.487Z","status":1},{"time":"2025-06-12T07:51:27.931Z","status":1}],"Github":[{"time":"2025-06-12T07:29:28.533Z","status":1},{"time":"2025-06-12T07:33:52.373Z","status":1},{"time":"2025-06-12T07:50:18.487Z","status":1},{"time":"2025-06-12T07:51:27.931Z","status":1}],"Farmanager v0":[{"time":"2025-06-12T07:29:28.533Z","status":1},{"time":"2025-06-12T07:33:52.373Z","status":1},{"time":"2025-06-12T07:50:18.487Z","status":1},{"time":"2025-06-12T07:51:27.931Z","status":1}],"Farmanager v1":[{"time":"2025-06-12T07:29:28.533Z","status":1},{"time":"2025-06-12T07:33:52.373Z","status":1},{"time":"2025-06-12T07:50:18.487Z","status":1},{"time":"2025-06-12T07:51:27.931Z","status":1}],"Botplus":[{"time":"2025-06-12T07:29:28.533Z","status":1},{"time":"2025-06-12T07:33:52.373Z","status":1},{"time":"2025-06-12T07:50:18.487Z","status":1},{"time":"2025-06-12T07:51:27.931Z","status":1}],"Sifarma":[{"time":"2025-06-12T07:29:28.533Z","status":0},{"time":"2025-06-12T07:33:52.373Z","status":0},{"time":"2025-06-12T07:50:18.487Z","status":0},{"time":"2025-06-12T07:51:27.931Z","status":0}]};
+    Object.entries(serverHistory).forEach(([serverName, data]) => {
+      const canvas = document.getElementById('chart-' + serverName.replace(/\s+/g, '-'));
+      if (!canvas) return;
 
-  <h2>Historial de uptime</h2>
-  <canvas id="uptimeChart"></canvas>
+      const labels = data.map(d => new Date(d.time).toLocaleTimeString());
+      const values = data.map(d => d.status);
 
-  <script>
-    const history = [{"timestamp":"2025-06-12T07:04:01.977Z","statuses":[{"name":"Servidor Fagor","status":"online"},{"name":"Servidor Github","status":"online"}]}];
-    const servers = ["Servidor Fagor","Servidor Github"];
-
-    const labels = history.map(h => new Date(h.timestamp).toLocaleString());
-    const datasets = servers.map(name => {
-      return {
-        label: name,
-        data: history.map(entry => {
-          const found = entry.statuses.find(s => s.name === name);
-          if (!found) return null;
-          return found.status === 'online' ? 1 : 0;
-        }),
-        fill: false,
-        borderColor: name === 'Servidor Principal' ? 'green' : 'blue',
-        tension: 0.1
-      };
-    });
-
-    new Chart(document.getElementById('uptimeChart'), {
-      type: 'line',
-      data: {
-        labels,
-        datasets
-      },
-      options: {
-        scales: {
-          y: {
-            ticks: {
-              callback: value => value === 1 ? 'Online' : 'Offline'
-            },
-            beginAtZero: true,
-            max: 1
+      new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: serverName,
+            data: values,
+            borderColor: '#3498db',
+            backgroundColor: 'rgba(52, 152, 219, 0.2)',
+            fill: true,
+            tension: 0.2
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              ticks: {
+                callback: v => v === 1 ? 'Online' : 'Offline'
+              },
+              min: 0,
+              max: 1
+            }
           }
         }
-      }
+      });
+    });
+  </script>
+  <footer>Última actualización: 12/6/2025, 9:51:28</footer>
+
+  <script>
+    const history = [{"timestamp":"2025-06-12T07:29:28.533Z","groups":[{"group":"Servidores internos","statuses":[{"name":"Fagor Healthcare","status":"online"},{"name":"Github","status":"online"}]},{"group":"Servidores externos","statuses":[{"name":"Farmanager v0","status":"online"},{"name":"Farmanager v1","status":"online"},{"name":"Botplus","status":"online"},{"name":"Sifarma","status":"error"}]}]},{"timestamp":"2025-06-12T07:33:52.373Z","groups":[{"group":"Servidores internos","statuses":[{"name":"Fagor Healthcare","status":"online"},{"name":"Github","status":"online"}]},{"group":"Servidores externos","statuses":[{"name":"Farmanager v0","status":"online"},{"name":"Farmanager v1","status":"online"},{"name":"Botplus","status":"online"},{"name":"Sifarma","status":"error"}]}]},{"timestamp":"2025-06-12T07:50:18.487Z","groups":[{"group":"Servidores internos","statuses":[{"name":"Fagor Healthcare","status":"online"},{"name":"Github","status":"online"}]},{"group":"Servidores externos","statuses":[{"name":"Farmanager v0","status":"online"},{"name":"Farmanager v1","status":"online"},{"name":"Botplus","status":"online"},{"name":"Sifarma","status":"error"}]}]},{"timestamp":"2025-06-12T07:51:27.931Z","groups":[{"group":"Servidores internos","statuses":[{"name":"Fagor Healthcare","status":"online"},{"name":"Github","status":"online"}]},{"group":"Servidores externos","statuses":[{"name":"Farmanager v0","status":"online"},{"name":"Farmanager v1","status":"online"},{"name":"Botplus","status":"online"},{"name":"Sifarma","status":"error"}]}]}];
+    const groups = ["Servidores internos","Servidores externos"];
+
+    groups.forEach(groupName => {
+      const groupData = history.map(entry => {
+        const g = entry.groups.find(grp => grp.group === groupName);
+        return g ? g.statuses : [];
+      });
+
+      const serverNames = groupData[0].map(s => s.name);
+
+      const datasets = serverNames.map(server => ({
+        label: server,
+        data: groupData.map(statuses => {
+          const s = statuses.find(s => s.name === server);
+          return s.status === 'online' ? 1 : 0;
+        }),
+        fill: false,
+        borderColor: '#' + Math.floor(Math.random()*16777215).toString(16),
+        tension: 0.1
+      }));
+
+      const labels = history.map(h => new Date(h.timestamp).toLocaleTimeString());
+
+      new Chart(document.getElementById('chart-' + groupName.replace(/\s+/g, '-')), {
+        type: 'line',
+        data: {
+          labels,
+          datasets
+        },
+        options: {
+          scales: {
+            y: {
+              ticks: {
+                callback: value => value === 1 ? 'Online' : 'Offline'
+              },
+              min: 0,
+              max: 1
+            }
+          }
+        }
+      });
+    });
+  </script>
+  <script>
+    const toggle = document.getElementById('theme-toggle');
+    const body = document.body;
+    const currentTheme = localStorage.getItem('theme') || 'light';
+
+    if (currentTheme === 'dark') {
+      body.classList.add('dark');
+    }
+
+    toggle.addEventListener('click', () => {
+      body.classList.toggle('dark');
+      localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
     });
   </script>
 
-  <p>Última actualización: 12/6/2025, 9:04:02</p>
 </body>
 </html>

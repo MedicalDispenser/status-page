@@ -1,14 +1,157 @@
 [
   {
-    "timestamp": "2025-06-12T07:04:01.977Z",
-    "statuses": [
+    "timestamp": "2025-06-12T07:29:28.533Z",
+    "groups": [
       {
-        "name": "Servidor Fagor",
-        "status": "online"
+        "group": "Servidores internos",
+        "statuses": [
+          {
+            "name": "Fagor Healthcare",
+            "status": "online"
+          },
+          {
+            "name": "Github",
+            "status": "online"
+          }
+        ]
       },
       {
-        "name": "Servidor Github",
-        "status": "online"
+        "group": "Servidores externos",
+        "statuses": [
+          {
+            "name": "Farmanager v0",
+            "status": "online"
+          },
+          {
+            "name": "Farmanager v1",
+            "status": "online"
+          },
+          {
+            "name": "Botplus",
+            "status": "online"
+          },
+          {
+            "name": "Sifarma",
+            "status": "error"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-12T07:33:52.373Z",
+    "groups": [
+      {
+        "group": "Servidores internos",
+        "statuses": [
+          {
+            "name": "Fagor Healthcare",
+            "status": "online"
+          },
+          {
+            "name": "Github",
+            "status": "online"
+          }
+        ]
+      },
+      {
+        "group": "Servidores externos",
+        "statuses": [
+          {
+            "name": "Farmanager v0",
+            "status": "online"
+          },
+          {
+            "name": "Farmanager v1",
+            "status": "online"
+          },
+          {
+            "name": "Botplus",
+            "status": "online"
+          },
+          {
+            "name": "Sifarma",
+            "status": "error"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-12T07:50:18.487Z",
+    "groups": [
+      {
+        "group": "Servidores internos",
+        "statuses": [
+          {
+            "name": "Fagor Healthcare",
+            "status": "online"
+          },
+          {
+            "name": "Github",
+            "status": "online"
+          }
+        ]
+      },
+      {
+        "group": "Servidores externos",
+        "statuses": [
+          {
+            "name": "Farmanager v0",
+            "status": "online"
+          },
+          {
+            "name": "Farmanager v1",
+            "status": "online"
+          },
+          {
+            "name": "Botplus",
+            "status": "online"
+          },
+          {
+            "name": "Sifarma",
+            "status": "error"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-12T07:51:27.931Z",
+    "groups": [
+      {
+        "group": "Servidores internos",
+        "statuses": [
+          {
+            "name": "Fagor Healthcare",
+            "status": "online"
+          },
+          {
+            "name": "Github",
+            "status": "online"
+          }
+        ]
+      },
+      {
+        "group": "Servidores externos",
+        "statuses": [
+          {
+            "name": "Farmanager v0",
+            "status": "online"
+          },
+          {
+            "name": "Farmanager v1",
+            "status": "online"
+          },
+          {
+            "name": "Botplus",
+            "status": "online"
+          },
+          {
+            "name": "Sifarma",
+            "status": "error"
+          }
+        ]
       }
     ]
   }
