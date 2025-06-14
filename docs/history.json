@@ -2338,5 +2338,44 @@
         ]
       }
     ]
+  },
+  {
+    "timestamp": "2025-06-14T21:13:05.215Z",
+    "groups": [
+      {
+        "group": "Servidores internos",
+        "statuses": [
+          {
+            "name": "Fagor Healthcare",
+            "status": "online"
+          },
+          {
+            "name": "Github",
+            "status": "online"
+          }
+        ]
+      },
+      {
+        "group": "Servidores externos",
+        "statuses": [
+          {
+            "name": "Farmanager v0",
+            "status": "offline"
+          },
+          {
+            "name": "Farmanager v1",
+            "status": "online"
+          },
+          {
+            "name": "Botplus",
+            "status": "online"
+          },
+          {
+            "name": "Sifarma",
+            "status": "error"
+          }
+        ]
+      }
+    ]
   }
 ]
