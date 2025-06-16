@@ -23,10 +23,41 @@ const groups = [
 async function checkServer(url) {
   try {
     const res = await fetch(url, { timeout: 5000 });
-    return res.ok ? 'online' : 'error';
-  } catch {
-    return 'offline';
+    if (!res.ok) {
+      return { status: 'error', reason: `Código HTTP: ${res.status}` };
+    }
+    return { status: 'online', reason: '' };
+  } catch (err) {
+    return { status: 'offline', reason: err.message };
   }
+}
+
+async function fetchIncidents() {
+  try {
+    const res = await fetch('https://nrapi.fmd.fagorhealthcare.com/v0/serverStatus');
+    const data = await res.json();
+    const incidents = {};
+    for (let i = 1; i < data.length; i++) {
+      const [server, dateTime, type, text] = data[i];
+      const [date, time] = dateTime.split(' ');
+      if (!incidents[server]) incidents[server] = {};
+      if (!incidents[server][date]) incidents[server][date] = [];
+      incidents[server][date].push({ time, type, text });
+    }
+    return incidents;
+  } catch (e) {
+    return {};
+  }
+}
+
+function statusIcon(status) {
+  return status === 'online' ? '🟢' : status === 'error' ? '🟠' : '🔴';
+}
+
+function statusClass(status) {
+  if (status === 'online') return 'ok';
+  if (status === 'error') return 'warn';
+  return 'down';
 }
 
 function loadHistory() {
@@ -40,222 +71,134 @@ function saveHistory(history) {
   fs.writeFileSync('docs/history.json', JSON.stringify(history, null, 2));
 }
 
-function statusIcon(status) {
-  return status === 'online' ? '✅' : status === 'error' ? '⚠️' : '❌';
-}
-
-function statusClass(status) {
-  if (status === 'online') return 'ok';
-  if (status === 'error') return 'warn';
-  return 'down';
-}
-
 async function generateHTML() {
   const timestamp = new Date().toISOString();
   const currentStatus = [];
+  const overallStatuses = [];
 
   for (const group of groups) {
     const statuses = [];
     for (const server of group.servers) {
-      const status = await checkServer(server.url);
-      statuses.push({ name: server.name, status });
+      const result = await checkServer(server.url);
+      statuses.push({ name: server.name, status: result.status, reason: result.reason });
+      overallStatuses.push(result.status);
     }
     currentStatus.push({ group: group.name, statuses });
   }
 
-  const history = loadHistory();
-  const serverHistory = {};
+  const overall = overallStatuses.every(s => s === 'online') ? '🟢' : '🔴';
 
+  const history = loadHistory();
   history.push({ timestamp, groups: currentStatus });
-  history.forEach((entry) => {
-    entry.groups.forEach((group) => {
-      group.statuses.forEach((server) => {
-        if (!serverHistory[server.name]) {
-          serverHistory[server.name] = [];
-        }
-        serverHistory[server.name].push({
-          time: entry.timestamp,
-          status: server.status === 'online' ? 1 : 0,
-        });
-      });
-    });
-  });
   saveHistory(history);
 
-  let html = `
-<!DOCTYPE html>
+  const incidents = await fetchIncidents();
+
+  let html = `<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <title>Estado de Servidores</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { font-family: sans-serif; background: #f4f4f4; padding: 2rem; color: #333; }
-    h1, h2 { text-align: center; }
-    section { background: #fff; border-radius: 10px; padding: 1rem; margin-bottom: 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-    th, td { padding: 0.75rem; border-bottom: 1px solid #ddd; }
-    .ok { color: green; font-weight: bold; }
-    .warn { color: orange; font-weight: bold; }
-    .down { color: red; font-weight: bold; }
-    canvas { max-width: 100%; margin-top: 1rem; }
-    footer { text-align: center; color: #777; font-size: 0.9rem; margin-top: 2rem; }
-    :root {
-      --bg: #ffffff;
-      --fg: #222222;
-      --card-bg: #f9f9f9;
-      --ok: #2ecc71;
-      --warn: #f1c40f;
-      --down: #e74c3c;
-    }
-
-    body.dark {
-      --bg: #1e1e1e;
-      --fg: #f0f0f0;
-      --card-bg: #2b2b2b;
-    }
-
     body {
-      background: var(--bg);
-      color: var(--fg);
-      font-family: sans-serif;
-      padding: 2rem;
-      transition: background 0.3s, color 0.3s;
+      font-family: system-ui, sans-serif;
+      background: #f9f9f9;
+      color: #333;
+      margin: 2rem;
     }
-
-    section {
-      background: var(--card-bg);
-      border-radius: 10px;
+    h1 {
+      font-size: 1.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+    }
+    details {
+      margin: 1rem 0;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
       padding: 1rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
-
-    .ok { color: var(--ok); font-weight: bold; }
-    .warn { color: var(--warn); font-weight: bold; }
-    .down { color: var(--down); font-weight: bold; }
-
+    summary {
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .ok { color: green; }
+    .warn { color: orange; }
+    .down { color: red; }
+    .reason {
+      font-size: 0.85rem;
+      color: #999;
+      margin-left: 1.5rem;
+    }
+    .incident-entry {
+      padding: 0.25rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.95rem;
+    }
+    .incident-entry .text {
+      flex: 1;
+      opacity: 0.8;
+    }
+    .incident-entry.error .text {
+      color: #c53030;
+    }
+    .incident-entry.solution .text {
+      color: #2f855a;
+    }
+    ul { padding-left: 1.2rem; }
+    li { margin-bottom: 0.5rem; }
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #666;
+    }
   </style>
 </head>
 <body>
-  <button id="theme-toggle" style="position: fixed; top: 1rem; right: 1rem; z-index: 1000;">🌓</button>
-  <h1>Estado de Servidores</h1>
+  <h1>Estado de Servidores <span>${overall}</span></h1>
 `;
 
   for (const group of currentStatus) {
-    html += `<section><h2>${group.group}</h2><table><thead><tr><th>Servidor</th><th>Estado</th></tr></thead><tbody>`;
-    for (const s of group.statuses) {
-      html += `<tr><td>${s.name}</td><td class="${statusClass(s.status)}">${statusIcon(s.status)} ${s.status}</td></tr>`;
+    const groupStatus = group.statuses.every(s => s.status === 'online') ? '🟢' : '🔴';
+    html += `<details><summary>${group.group} - ${groupStatus}</summary><ul>`;
+    for (const server of group.statuses) {
+      html += `<li><details><summary>${statusIcon(server.status)} <span class="${statusClass(server.status)}">${server.name}</span>`;
+      if (server.status === 'error') {
+        html += `<div class="reason">(${server.reason})</div>`;
+      }
+      html += `</summary>`;
+      const serverIncidents = incidents[server.name] || {};
+      const sortedDates = Object.keys(serverIncidents).sort().reverse();
+      if (sortedDates.length > 0) {
+        html += '<ul>';
+        for (const date of sortedDates) {
+          html += `<li><strong>${date}</strong><ul>`;
+          for (const incident of serverIncidents[date]) {
+            const cls = incident.type.toLowerCase() === 'error' ? 'error' : 'solution';
+            html += `<li class="incident-entry ${cls}"><span class="text">${incident.type} - ${incident.text}</span><span class="time">${incident.time}</span></li>`;
+          }
+          html += '</ul></li>';
+        }
+        html += '</ul>';
+      } else {
+        html += '<p>Sin incidencias registradas.</p>';
+      }
+      html += '</details></li>';
     }
-    html += `</tbody></table><canvas id="chart-${group.group.replace(/\s+/g, '-')}" height="100"></canvas></section>`;
-    //html += `<canvas id="chart-${s.name.replace(/\s+/g, '-')}" height="100"></canvas>`;
+    html += '</ul></details>';
   }
-  html += `<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>`;
-  html += `<script>
-    const serverHistory = ${JSON.stringify(serverHistory)};
-    Object.entries(serverHistory).forEach(([serverName, data]) => {
-      const canvas = document.getElementById('chart-' + serverName.replace(/\\s+/g, '-'));
-      if (!canvas) return;
 
-      const labels = data.map(d => new Date(d.time).toLocaleTimeString());
-      const values = data.map(d => d.status);
-
-      new Chart(canvas, {
-        type: 'line',
-        data: {
-          labels,
-          datasets: [{
-            label: serverName,
-            data: values,
-            borderColor: '#3498db',
-            backgroundColor: 'rgba(52, 152, 219, 0.2)',
-            fill: true,
-            tension: 0.2
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              ticks: {
-                callback: v => v === 1 ? 'Online' : 'Offline'
-              },
-              min: 0,
-              max: 1
-            }
-          }
-        }
-      });
-    });
-  </script>`;
-  html += `
-  <footer>Última actualización: ${new Date().toLocaleString()}</footer>
-
-  <script>
-    const history = ${JSON.stringify(history)};
-    const groups = ${JSON.stringify(groups.map(g => g.name))};
-
-    groups.forEach(groupName => {
-      const groupData = history.map(entry => {
-        const g = entry.groups.find(grp => grp.group === groupName);
-        return g ? g.statuses : [];
-      });
-
-      const serverNames = groupData[0].map(s => s.name);
-
-      const datasets = serverNames.map(server => ({
-        label: server,
-        data: groupData.map(statuses => {
-          const s = statuses.find(s => s.name === server);
-          return s.status === 'online' ? 1 : 0;
-        }),
-        fill: false,
-        borderColor: '#' + Math.floor(Math.random()*16777215).toString(16),
-        tension: 0.1
-      }));
-
-      const labels = history.map(h => new Date(h.timestamp).toLocaleTimeString());
-
-      new Chart(document.getElementById('chart-' + groupName.replace(/\\s+/g, '-')), {
-        type: 'line',
-        data: {
-          labels,
-          datasets
-        },
-        options: {
-          scales: {
-            y: {
-              ticks: {
-                callback: value => value === 1 ? 'Online' : 'Offline'
-              },
-              min: 0,
-              max: 1
-            }
-          }
-        }
-      });
-    });
-  </script>
-  <script>
-    const toggle = document.getElementById('theme-toggle');
-    const body = document.body;
-    const currentTheme = localStorage.getItem('theme') || 'light';
-
-    if (currentTheme === 'dark') {
-      body.classList.add('dark');
-    }
-
-    toggle.addEventListener('click', () => {
-      body.classList.toggle('dark');
-      localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
-    });
-  </script>
-
+  html += `<footer>Última actualización: ${new Date().toLocaleString()}</footer>
 </body>
-</html>
-`;
+</html>`;
 
   fs.writeFileSync('docs/index.html', html);
-  console.log('HTML generado con agrupaciones');
+  console.log('HTML generado con incidencias agrupadas por días.');
 }
 
 generateHTML();
