@@ -7744,5 +7744,50 @@
         ]
       }
     ]
+  },
+  {
+    "timestamp": "2025-06-23T15:16:36.112Z",
+    "groups": [
+      {
+        "group": "Servidores internos",
+        "statuses": [
+          {
+            "name": "Fagor Healthcare",
+            "status": "offline",
+            "reason": "request to https://www.fagorhealthcare.com/FMD/update.ini failed, reason: read ECONNRESET"
+          },
+          {
+            "name": "Github",
+            "status": "online",
+            "reason": ""
+          }
+        ]
+      },
+      {
+        "group": "Servidores externos",
+        "statuses": [
+          {
+            "name": "Farmanager v0",
+            "status": "online",
+            "reason": ""
+          },
+          {
+            "name": "Farmanager v1",
+            "status": "online",
+            "reason": ""
+          },
+          {
+            "name": "Botplus",
+            "status": "online",
+            "reason": ""
+          },
+          {
+            "name": "Sifarma",
+            "status": "error",
+            "reason": "Código HTTP: 403"
+          }
+        ]
+      }
+    ]
   }
 ]
