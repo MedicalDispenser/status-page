@@ -31234,5 +31234,50 @@
         ]
       }
     ]
+  },
+  {
+    "timestamp": "2025-07-17T09:19:40.787Z",
+    "groups": [
+      {
+        "group": "Servidores internos",
+        "statuses": [
+          {
+            "name": "Fagor Healthcare",
+            "status": "online",
+            "reason": ""
+          },
+          {
+            "name": "Github",
+            "status": "online",
+            "reason": ""
+          }
+        ]
+      },
+      {
+        "group": "Servidores externos",
+        "statuses": [
+          {
+            "name": "Farmanager v0",
+            "status": "online",
+            "reason": ""
+          },
+          {
+            "name": "Farmanager v1",
+            "status": "online",
+            "reason": ""
+          },
+          {
+            "name": "Botplus",
+            "status": "online",
+            "reason": ""
+          },
+          {
+            "name": "Sifarma",
+            "status": "error",
+            "reason": "Código HTTP: 403"
+          }
+        ]
+      }
+    ]
   }
 ]
