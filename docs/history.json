@@ -58189,5 +58189,50 @@
         ]
       }
     ]
+  },
+  {
+    "timestamp": "2025-08-13T14:16:14.159Z",
+    "groups": [
+      {
+        "group": "Servidores internos",
+        "statuses": [
+          {
+            "name": "Fagor Healthcare",
+            "status": "online",
+            "reason": ""
+          },
+          {
+            "name": "Github",
+            "status": "online",
+            "reason": ""
+          }
+        ]
+      },
+      {
+        "group": "Servidores externos",
+        "statuses": [
+          {
+            "name": "Farmanager v0",
+            "status": "offline",
+            "reason": "request to http://151.80.33.210:8081/Restful/ failed, reason: connect ETIMEDOUT 151.80.33.210:8081"
+          },
+          {
+            "name": "Farmanager v1",
+            "status": "offline",
+            "reason": "request to https://api.farmanager.es/ failed, reason: connect ETIMEDOUT 34.175.42.237:443"
+          },
+          {
+            "name": "Botplus",
+            "status": "online",
+            "reason": ""
+          },
+          {
+            "name": "Sifarma",
+            "status": "error",
+            "reason": "Código HTTP: 403"
+          }
+        ]
+      }
+    ]
   }
 ]
