@@ -176629,5 +176629,50 @@
         ]
       }
     ]
+  },
+  {
+    "timestamp": "2025-12-09T08:23:31.154Z",
+    "groups": [
+      {
+        "group": "Servidores internos",
+        "statuses": [
+          {
+            "name": "Fagor Healthcare",
+            "status": "offline",
+            "reason": "request to https://www.fagorhealthcare.com/FMD/update.ini failed, reason: Client network socket disconnected before secure TLS connection was established"
+          },
+          {
+            "name": "Github",
+            "status": "online",
+            "reason": ""
+          }
+        ]
+      },
+      {
+        "group": "Servidores externos",
+        "statuses": [
+          {
+            "name": "Farmanager v0",
+            "status": "offline",
+            "reason": "request to http://151.80.33.210:8081/Restful/ failed, reason: connect ETIMEDOUT 151.80.33.210:8081"
+          },
+          {
+            "name": "Farmanager v1",
+            "status": "online",
+            "reason": ""
+          },
+          {
+            "name": "Botplus",
+            "status": "online",
+            "reason": ""
+          },
+          {
+            "name": "Sifarma",
+            "status": "error",
+            "reason": "Código HTTP: 403"
+          }
+        ]
+      }
+    ]
   }
 ]
